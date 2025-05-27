@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daily Mystery Challenge</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script src="daily_mystery_questions.js"></script>
+</head>
+<body class="bg-gradient-to-tr from-gray-100 to-gray-200 text-gray-900 min-h-screen flex items-center justify-center p-6">
+
+  <div class="max-w-2xl w-full bg-white p-8 rounded-2xl shadow-2xl">
+    <h1 class="text-4xl font-bold mb-4 text-center text-blue-700">🕵️ Daily Mystery</h1>
+    <p class="text-center text-gray-500 mb-6">Can you solve today's 5 tough cases?</p>
+
+    <div id="questionsContainer" class="space-y-6"></div>
+
+    <div class="mt-6 text-center">
+      <button id="submitBtn" class="bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700 transition">
+        Submit Answers
+      </button>
+      <p id="feedback" class="mt-4 text-lg font-semibold"></p>
+    </div>
+  </div>
+
+  <script>
+    // Get today's set of questions
+    const today = new Date();
+    const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+    const todaySet = dailyQuestions[dayOfYear % dailyQuestions.length];
+
+    const container = document.getElementById("questionsContainer");
+
+    // Display each question with a text box
+    todaySet.forEach((question, index) => {
+      const div = document.createElement("div");
+      div.innerHTML = `
+        <label class="block font-medium mb-2">${index + 1}. ${question}</label>
+        <textarea id="q${index}" rows="3" class="w-full border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+      `;
+      container.appendChild(div);
+    });
+
+    // Button click: check if all answers are filled
+    document.getElementById("submitBtn").addEventListener("click", () => {
+      const allFilled = todaySet.every((_, index) => {
+        return document.getElementById(`q${index}`).value.trim() !== "";
+      });
+
+      const feedback = document.getElementById("feedback");
+
+      if (allFilled) {
+        feedback.textContent = "🎉 Solved! Come back tomorrow for a new case.";
+        feedback.className = "text-green-600 font-bold mt-4 text-center";
+        confetti({
+          particleCount: 250,
+          spread: 100,
+          origin: { y: 0.6 }
+        });
+      } else {
+        feedback.textContent = "⚠️ Please answer all questions.";
+        feedback.className = "text-red-600 font-semibold mt-4 text-center";
+      }
+    });
+  </script>
+</body>
+</html>
